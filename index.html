@@ -195,6 +195,28 @@ body.wel header{grid-column:1/-1}body.wel header .logo{display:flex}
 #tbl td{vertical-align:middle}
 #tbl th:nth-child(n+3):nth-child(-n+6),#tbl td:nth-child(n+3):nth-child(-n+6){text-align:center}
 #tbl td:nth-child(2){min-width:200px}#tbl td:nth-child(1){min-width:100px}.dbox{width:auto;max-width:280px}#tbl th,#tbl td{padding-left:8px;padding-right:8px}
+
+/* v8: extracurriculars */
+.ecl{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.ec{border:1px solid var(--glb);background:var(--gl2);border-radius:16px;overflow:hidden}
+.ec-h{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer}
+.ec-h:hover{background:var(--gl)}
+.ec-h:focus-visible{outline:2px solid var(--em);outline-offset:-2px}
+.ec-ch{width:8px;height:8px;border-right:2px solid var(--mu);border-bottom:2px solid var(--mu);transform:rotate(-45deg);flex:none}
+.ec.open .ec-ch{transform:rotate(45deg)}
+.ec-m{flex:1;min-width:0}
+.ec-t{font-weight:700;font-size:calc(16.5px*var(--ts));overflow-wrap:anywhere}
+.ec-p{color:var(--mu);font-size:calc(13.5px*var(--ts));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ec.open .ec-p{display:none}
+.ec-d{color:var(--mu);font-size:calc(13.5px*var(--ts));white-space:nowrap;min-width:4.5em;text-align:right}
+.ec-b{display:none;padding:2px 16px 16px 36px;border-top:1px solid var(--glb)}
+.ec.open .ec-b{display:block;padding-top:12px}
+.ec-b p{margin:0 0 8px;overflow-wrap:anywhere}.ec-b ul{margin:0 0 10px;padding-left:20px}.ec-b li{margin:3px 0;overflow-wrap:anywhere}
+.cdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.ecc{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.ecx{padding:2px 9px;margin-left:4px}
+@media(prefers-reduced-motion:no-preference){.ec-ch{transition:transform .15s}}
+@media(max-width:640px){.ec-h{flex-wrap:wrap}.ec-m{flex-basis:calc(100% - 30px)}.ec-d{margin-left:auto}.ec-b{padding-left:16px}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" onerror="window.XLSX=null"></script>
 
@@ -263,7 +285,7 @@ function g11For(g){const p=g.code.slice(0,3),pre=[p].concat(PRE[p]||[]);let best
 function withPred(g){if(g.grade!=null||!S.pred||g.level!==12||g.status==='Completed')return g;const s=g11For(g);if(!s)return g;const drop=/^M(HF|CV|DM)/.test(g.code)?3:2;return{...g,grade:Math.min(100,Math.max(0,Math.round((s.grade-drop)*10)/10)),pred:true,predFrom:s.code+' '+s.grade+'%'}}
 
 let S={page:'dash',grades:[],apps:[],data:[],base:[],name:'',pred:true,f:{u:'',p:'',d:'',c:'',q:'',eng:false,g:'',sp:'',sort:'avgD'},pg:1,msg:null,incl:true};
-function load(){try{S.grades=JSON.parse(localStorage.getItem('tfc:grades')||'[]');S.apps=JSON.parse(localStorage.getItem('tfc:apps')||'[]');S.ev=JSON.parse(localStorage.getItem('tfc:events')||'[]');S.t6=JSON.parse(localStorage.getItem('tfc:t6')||'{"mode":"auto","ids":[]}');S.psel=JSON.parse(localStorage.getItem('tfc:psel')||'{}');S.name=localStorage.getItem('tfc:name')||'';S.pred=JSON.parse(localStorage.getItem('tfc:pred')||'true');const d=JSON.parse(localStorage.getItem('tfc:data')||'[]');S.data=d.map(a=>({uni:a[0],prog:a[1],code:a[2],dec:a[3],avg:a[4],raw:a[5],app:a[6],dd:a[7],grp:a[8],cit:a[9],prov:a[10],supp:a[11],sn:a[12],com:a[13],eng:/engineer|mechatronic|engsci/i.test(a[1]+' '+a[2])})).map(cl);{const th=localStorage.getItem('tfc:theme');if(th==='d'||th==='dark')document.documentElement.dataset.theme='dark';else if(th==='l'||th==='light')document.documentElement.dataset.theme='light'}}catch(e){toast('Saved data could not be read.')}}
+function load(){try{S.grades=JSON.parse(localStorage.getItem('tfc:grades')||'[]');S.apps=JSON.parse(localStorage.getItem('tfc:apps')||'[]');S.ev=JSON.parse(localStorage.getItem('tfc:events')||'[]');S.t6=JSON.parse(localStorage.getItem('tfc:t6')||'{"mode":"auto","ids":[]}');S.psel=JSON.parse(localStorage.getItem('tfc:psel')||'{}');S.name=localStorage.getItem('tfc:name')||'';S.pred=JSON.parse(localStorage.getItem('tfc:pred')||'true');{const ec=JSON.parse(localStorage.getItem('tfc:ecs')||'[]'),cg=JSON.parse(localStorage.getItem('tfc:eccats')||'null');S.ecs=Array.isArray(ec)?ec.filter(x=>x&&typeof x==='object'&&x.id).map(x=>({id:String(x.id),t:String(x.t||'Untitled'),c:String(x.c||'Other'),y:String(x.y||''),b:String(x.b||''),ts:+x.ts||0})):[];S.eccats=Array.isArray(cg)&&cg.length?cg.map(String):ECDEF.slice();S.ecs.forEach(x=>{if(!S.eccats.includes(x.c))S.eccats.push(x.c)})}const d=JSON.parse(localStorage.getItem('tfc:data')||'[]');S.data=d.map(a=>({uni:a[0],prog:a[1],code:a[2],dec:a[3],avg:a[4],raw:a[5],app:a[6],dd:a[7],grp:a[8],cit:a[9],prov:a[10],supp:a[11],sn:a[12],com:a[13],eng:/engineer|mechatronic|engsci/i.test(a[1]+' '+a[2])})).map(cl);{const th=localStorage.getItem('tfc:theme');if(th==='d'||th==='dark')document.documentElement.dataset.theme='dark';else if(th==='l'||th==='light')document.documentElement.dataset.theme='light'}}catch(e){toast('Saved data could not be read.')}}
 function save(k){try{const v=k==='data'?S.data.map(r=>[r.uni,r.prog,r.code,r.dec,r.avg,r.raw,r.app,r.dd,r.grp,r.cit,r.prov,r.supp,r.sn,r.com]):S[k];localStorage.setItem('tfc:'+(k==='ev'?'events':k),JSON.stringify(v));return true}catch(e){toast('Could not save \u2014 browser storage is full. Data stays until you close this tab.');return false}}
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',4500)}
 /* ---------- grades ---------- */
@@ -337,7 +359,7 @@ function pWelcome(){return`<div class="welcome"><div class="pnl wcard"><div clas
 function setName(){const v=($('#wn').value||'').trim().replace(/\s+/g,' ').slice(0,40);if(!v){$('#wnerr').textContent='Enter your name to continue.';return}S.name=v;try{localStorage.setItem('tfc:name',v)}catch(_){}S.page='dash';render()}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='wn')setName()});
 /* ---------- shell ---------- */
-const PG={dash:['Dashboard',pDash],grades:['My Grades',pGrades],unis:['Universities',pUnis],progs:['Programs',pProgs],cmp:['Compare',pCmp],apps:['My Applications',pApps],cal:['Calendar',pCal],data:['Application Data',pData]};
+const PG={dash:['Dashboard',pDash],grades:['My Grades',pGrades],unis:['Universities',pUnis],progs:['Programs',pProgs],cmp:['Compare',pCmp],apps:['My Applications',pApps],ecs:['Extracurriculars',pEcs],cal:['Calendar',pCal],data:['Application Data',pData]};
 function render(){document.body.classList.toggle('wel',!S.name);if(!S.name){$('#nav').innerHTML='';$('#app').innerHTML=pWelcome();const wn=$('#wn');if(wn)wn.focus();return}$('#nav').innerHTML='<div class="navlogo logo"><i></i>The Quad</div>'+Object.entries(PG).map(([k,v])=>`<button data-go="${k}" class="${S.page===k?'on':''}">${v[0]}</button>`).join('');$('#app').innerHTML=PG[S.page][1]();const dr=$('#drop');if(dr){const fi=$('#file');fi.onchange=()=>fi.files[0]&&readFile(fi.files[0]);dr.ondragover=e=>{e.preventDefault();dr.classList.add('ov')};dr.ondragleave=()=>dr.classList.remove('ov');dr.ondrop=e=>{e.preventDefault();dr.classList.remove('ov');e.dataTransfer.files[0]&&readFile(e.dataTransfer.files[0])}}const q=$('#q');if(q)q.oninput=()=>{S.f.q=q.value;S.pg=1;$('#tbl').innerHTML=tbl()}}
 const gid=t=>S.grades.find(g=>String(g.id)===t.dataset.id);
 document.addEventListener('click',e=>{const t=e.target.closest('[data-go],[data-act]');if(!t)return;if(t.dataset.go){S.page=t.dataset.go;S.msg=null;render();scrollTo(0,0);return}const a=t.dataset.act;
@@ -525,6 +547,51 @@ render()});
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.cd[data-do]')){e.preventDefault();e.target.click()}});
 document.addEventListener('input',e=>{const t=e.target;if(t.id!=='uq'&&t.id!=='pq')return;if(t.id==='uq')S.uq=t.value;else S.pf.q=t.value;render();const n=document.getElementById(t.id);n.focus();n.setSelectionRange(n.value.length,n.value.length)});
 
+/* ---------- extracurriculars (supplementary applications) ---------- */
+const ECDEF=['Volunteer','Co-op / Job','Clubs','Sports','Leadership','Awards','Projects','Arts','Other'];
+Object.assign(S,{ecs:[],eccats:ECDEF.slice(),ecopen:{},ecedit:'',ecstash:null,ecf:'',ecsort:'new',ecmc:false,ecd:{t:'',c:'',y:'',b:''}});
+const ecYr=s=>{s=String(s||'');if(/present|current|ongoing|now/i.test(s))return 9999;const m=s.match(/(?:19|20)\d{2}/g);return m?Math.max(...m.map(Number)):0};
+const ecBul=/^[-•*–]\s+(.*)$/;
+function ecBody(t){let h='',ul=false;for(const raw of String(t||'').split(/\r?\n/)){const l=raw.trim(),m=l.match(ecBul);if(m){if(!ul){h+='<ul>';ul=true}h+='<li>'+esc(m[1])+'</li>'}else{if(ul){h+='</ul>';ul=false}if(l)h+='<p>'+esc(l)+'</p>'}}if(ul)h+='</ul>';return h||'<p class="note">No details yet.</p>'}
+const ecPrev=t=>String(t||'').split(/\r?\n/).map(l=>l.trim().replace(ecBul,'$1')).filter(Boolean).join(' · ').slice(0,140);
+const ecDot=c=>{const i=S.eccats.indexOf(c);return`<span class="cdot" style="background:hsl(${((i<0?S.eccats.length:i)*53+150)%360} 50% 52%)"></span>`};
+const ecOpts=v=>{const c=S.eccats.includes(v)||!v?S.eccats:S.eccats.concat(v);return c.map(x=>`<option value="${esc(x)}" ${x===(v||c[0])?'selected':''}>${esc(x)}</option>`).join('')};
+function ecSorted(){const cats=S.eccats,ci=c=>{const i=cats.indexOf(c);return i<0?99:i},o=S.ecsort;let l=S.ecs.filter(e=>!S.ecf||e.c===S.ecf);
+l.sort((a,b)=>o==='old'?(ecYr(a.y)||99999)-(ecYr(b.y)||99999)||a.ts-b.ts:o==='az'?a.t.localeCompare(b.t):o==='cat'?ci(a.c)-ci(b.c)||ecYr(b.y)-ecYr(a.y)||b.ts-a.ts:ecYr(b.y)-ecYr(a.y)||b.ts-a.ts);return l}
+function ecText(){return ecSorted().map(e=>{const body=String(e.b||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>ecBul.test(l)?'- '+l.replace(ecBul,'$1'):l).join('\n');return e.t+' ('+e.c+(e.y?', '+e.y:'')+')'+(body?'\n'+body:'')}).join('\n\n')}
+function pEcs(){const all=S.ecs,ed=S.ecedit,d=S.ecd,list=ecSorted(),cnt=c=>all.filter(e=>e.c===c).length,allOpen=list.length&&list.every(e=>S.ecopen[e.id]);
+const sa=S.apps.filter(a=>a.pid&&pById(a.pid)).map(a=>pById(a.pid)).filter(p=>suppYN(p)[0]!=='No');
+const card=e=>{const o=!!S.ecopen[e.id];return`<div class="ec ${o?'open':''}" data-ecid="${esc(e.id)}"><div class="ec-h" role="button" tabindex="0" aria-expanded="${o}" data-ec="tog"><span class="ec-ch" aria-hidden="true"></span><div class="ec-m"><div class="ec-t">${esc(e.t)}</div><div class="ec-p">${esc(ecPrev(e.b))}</div></div><span class="tag">${ecDot(e.c)}${esc(e.c)}</span><span class="ec-d">${esc(e.y)}</span></div><div class="ec-b">${ecBody(e.b)}<div class="row" style="margin-top:6px"><button data-ec="edit" data-id="${esc(e.id)}">Edit</button><button class="dng" data-ec="del" data-id="${esc(e.id)}">Delete</button></div></div></div>`};
+return`<h1>Extracurriculars</h1><p class="sub">Keep every activity in one place so supplementary applications are easy to write. Each box has a title, a category, a date or year, and details. Click a box to open or minimize it.</p>
+${sa.length?`<p class="note">${sa.length} of your applications ask for a supplementary application: ${sa.map(p=>esc(p.uns+': '+p.name)).join('; ')}.</p>`:''}
+<div class="pnl" id="ecform"><div class="ph"><span>${ed?'edit activity':'add an activity'}</span></div>
+<div class="row"><div style="flex:2;min-width:220px"><label class="lb" for="ecT">Title</label><input id="ecT" data-ecf="t" maxlength="120" placeholder="e.g. Hospital volunteer, Robotics club captain" value="${esc(d.t)}"></div><div style="min-width:170px"><label class="lb" for="ecC">Category</label><select id="ecC" data-ecf="c">${ecOpts(d.c)}</select></div><div style="min-width:190px"><label class="lb" for="ecY">Date or year</label><input id="ecY" data-ecf="y" maxlength="40" placeholder="e.g. 2025 or Sep 2023 – Present" value="${esc(d.y)}"></div></div>
+<div style="margin-top:12px"><label class="lb" for="ecB">Details</label><textarea id="ecB" data-ecf="b" rows="6" maxlength="6000" style="width:100%;margin-top:4px" placeholder="Write sentences, or bullet points (start a line with - ), or mix both.">${esc(d.b)}</textarea></div>
+<div class="row" style="margin-top:12px"><button class="pri" data-ec="save">${ed?'Save changes':'Add activity'}</button>${ed?'<button data-ec="cancel">Cancel</button>':''}<button data-ec="bul" title="Turn every line into a bullet, or remove the bullets">Toggle bullets</button></div></div>
+<details class="pnl" data-ecdet ${S.ecmc?'open':''}><summary>Manage categories</summary><p class="note">Add your own categories. A category can only be removed when no activity uses it.</p><div class="ecc">${S.eccats.map(c=>`<span class="tag">${ecDot(c)}${esc(c)}<button class="ecx" data-ec="delcat" data-c="${esc(c)}" aria-label="Remove category ${esc(c)}">×</button></span>`).join('')}</div><div class="row"><div style="min-width:200px"><label class="lb" for="ecNC">New category</label><input id="ecNC" maxlength="30" placeholder="e.g. Research, Music"></div><button data-ec="addcat">Add category</button></div></details>
+<div class="pnl"><div class="ph"><span>your activities (${list.length}${S.ecf?' of '+all.length:''})</span></div>
+<div class="ecc"><button class="${S.ecf?'':'on'}" data-ec="flt" data-c="">All (${all.length})</button>${S.eccats.map(c=>`<button class="${S.ecf===c?'on':''}" data-ec="flt" data-c="${esc(c)}">${ecDot(c)}${esc(c)} (${cnt(c)})</button>`).join('')}</div>
+<div class="row"><div><label class="lb" for="ecS">Sort</label><select id="ecS" data-ecs><option value="new" ${S.ecsort==='new'?'selected':''}>Newest first</option><option value="old" ${S.ecsort==='old'?'selected':''}>Oldest first</option><option value="cat" ${S.ecsort==='cat'?'selected':''}>By category</option><option value="az" ${S.ecsort==='az'?'selected':''}>Title A–Z</option></select></div><button data-ec="${allOpen?'closeall':'openall'}" ${list.length?'':'disabled'}>${allOpen?'Minimize all':'Expand all'}</button><button data-ec="copyall" ${list.length?'':'disabled'}>Copy all as text</button></div>
+<div class="ecl" style="margin-top:14px">${list.map(card).join('')||`<p class="note">${all.length?'No activities in this category yet.':'No activities yet. Add your first one above.'}</p>`}</div></div>`}
+function ecReset(){S.ecd=S.ecstash||{t:'',c:'',y:'',b:''};S.ecstash=null;S.ecedit=''}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-ec]');if(!t)return;const a=t.dataset.ec,id=t.dataset.id;
+if(a==='tog'){const c=t.closest('.ec'),k=c.dataset.ecid,o=!c.classList.contains('open');c.classList.toggle('open',o);t.setAttribute('aria-expanded',o);if(o)S.ecopen[k]=1;else delete S.ecopen[k];return}
+if(a==='save'){const tt=$('#ecT').value.trim().replace(/\s+/g,' '),cc=$('#ecC').value,yy=$('#ecY').value.trim(),bb=$('#ecB').value.replace(/\s+$/,'');if(!tt){toast('Give the activity a title first.');$('#ecT').focus();return}
+if(S.ecedit){const x=S.ecs.find(z=>z.id===S.ecedit);if(x){x.t=tt;x.c=cc;x.y=yy;x.b=bb}ecReset();toast('Changes saved.')}else{const nid=Date.now().toString(36)+Math.random().toString(36).slice(2,7);S.ecs.push({id:nid,t:tt,c:cc,y:yy,b:bb,ts:Date.now()});S.ecd={t:'',c:cc,y:'',b:''};toast('Activity added.')}
+save('ecs');render();return}
+if(a==='cancel'){ecReset();render();return}
+if(a==='edit'){const x=S.ecs.find(z=>z.id===id);if(!x)return;if(!S.ecedit)S.ecstash={...S.ecd};S.ecedit=x.id;S.ecd={t:x.t,c:x.c,y:x.y,b:x.b};render();const f=$('#ecform');if(f)f.scrollIntoView({behavior:'smooth',block:'start'});const i=$('#ecT');if(i)i.focus({preventScroll:true});return}
+if(a==='del'){if(!sure(t))return;S.ecs=S.ecs.filter(z=>z.id!==id);delete S.ecopen[id];if(S.ecedit===id)ecReset();save('ecs');render();return}
+if(a==='bul'){const b=$('#ecB'),L=b.value.split(/\r?\n/),ne=L.filter(l=>l.trim()),all=ne.length&&ne.every(l=>ecBul.test(l.trim()));b.value=L.map(l=>{const s=l.trim();if(!s)return'';return all?s.replace(ecBul,'$1'):ecBul.test(s)?s:'- '+s}).join('\n');S.ecd.b=b.value;b.focus();return}
+if(a==='flt'){S.ecf=t.dataset.c||'';render();return}
+if(a==='openall'||a==='closeall'){ecSorted().forEach(z=>{if(a==='openall')S.ecopen[z.id]=1;else delete S.ecopen[z.id]});render();return}
+if(a==='copyall'){const tx=ecText(),ok=()=>toast('Copied. Paste it into your supplementary application.');const fb=()=>{const ta=document.createElement('textarea');ta.value=tx;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();let r=false;try{r=document.execCommand('copy')}catch(_){}ta.remove();r?ok():toast('Could not copy. Try again or select the text by hand.')};(navigator.clipboard?navigator.clipboard.writeText(tx).then(ok).catch(fb):fb());return}
+if(a==='addcat')return ecAddCat();
+if(a==='delcat'){const c=t.dataset.c;if(S.ecs.some(z=>z.c===c))return toast('Some activities use "'+c+'". Move them to another category first.');if(S.eccats.length<=1)return toast('Keep at least one category.');S.eccats=S.eccats.filter(x=>x!==c);if(S.ecf===c)S.ecf='';if(S.ecd.c===c)S.ecd.c='';save('eccats');render()}});
+function ecAddCat(){const i=$('#ecNC'),v=(i.value||'').trim().replace(/\s+/g,' ').slice(0,30);if(!v)return toast('Type a category name first.');const ex=S.eccats.find(c=>c.toLowerCase()===v.toLowerCase());if(ex){toast('"'+ex+'" already exists.');return}S.eccats.push(v);S.ecd.c=v;save('eccats');S.ecmc=true;render();const n=$('#ecNC');if(n)n.focus()}
+['input','change'].forEach(ev=>document.addEventListener(ev,e=>{const t=e.target,k=t.dataset&&t.dataset.ecf;if(k)S.ecd[k]=t.value;else if(ev==='change'&&t.dataset&&t.dataset.ecs!==undefined){S.ecsort=t.value;render()}}));
+document.addEventListener('keydown',e=>{const t=e.target;if(t.matches&&t.matches('.ec-h')&&(e.key==='Enter'||e.key===' ')){e.preventDefault();t.click()}else if(t.id==='ecNC'&&e.key==='Enter'){e.preventDefault();ecAddCat()}});
+document.addEventListener('toggle',e=>{if(e.target.dataset&&e.target.dataset.ecdet!==undefined)S.ecmc=e.target.open},true);
 S.evd=todayS();
 S.base=BASE.map(a=>cl({uni:a[0],prog:a[1],code:a[2],dec:a[3],avg:a[4],raw:a[5],app:a[6],dd:a[7],grp:a[8],cit:a[9],prov:a[10],supp:a[11],sn:a[12],com:a[13],eng:false}));
 load();render();(function k(){$('#clk').textContent='Toronto '+new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());setTimeout(k,30000)})();
